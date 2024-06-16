@@ -88,8 +88,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full px-2 py-2 bg-white shadow md:hidden">
-        <p className="text-2xl font-bold text-blue-700">Forum Kampus</p>
+      <div className="fixed top-0 left-0 right-0 flex items-center justify-between w-full px-2 bg-white shadow md:hidden">
+        <img src="./../Image/fk.png" alt="Logo" className="max-w-[106px] aspect-video" />
         <div className="flex items-center gap-4">
           <button>
             <i className="text-2xl bx bx-search" />

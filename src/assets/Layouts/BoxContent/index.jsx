@@ -19,7 +19,7 @@ const BoxContent = () => {
         </div>
       </div>
       <div className="px-3">
-        <p>
+        <p className="max-sm:text-sm">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam
           ipsum nemo vel, mollitia exercitationem recusandae magnam odit. Quam
           pariatur at iusto sint omnis. Recusandae vel reprehenderit eaque porro
@@ -46,15 +46,15 @@ const BoxContent = () => {
         <div className="flex w-full pt-2">
           <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bx-like" />
-            <p className="">Suka</p>
+            <p className="max-sm:text-sm">Suka</p>
           </div>
           <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bx-comment" />
-            <p className="">Komentar</p>
+            <p className="max-sm:text-sm">Komentar</p>
           </div>
           <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bxs-share-alt" />
-            <p className="">Bagikan</p>
+            <p className="max-sm:text-sm">Bagikan</p>
           </div>
         </div>
       </div>
