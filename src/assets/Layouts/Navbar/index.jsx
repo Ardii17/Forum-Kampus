@@ -164,7 +164,8 @@ const Navbar = () => {
           <img
             src="./../Image/fk.png"
             alt="Logo"
-            className="max-w-[106px] aspect-video"
+            width={60}
+            className="scale-150 aspect-square"
           />
           <div className="flex items-center gap-4">
             <button onClick={() => setOnSearch(true)}>
