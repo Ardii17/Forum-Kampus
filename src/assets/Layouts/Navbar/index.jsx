@@ -168,7 +168,11 @@ const Navbar = () => {
             className="scale-150 aspect-square"
           />
           <div className="flex items-center gap-4">
-            <button onClick={() => setOnSearch(true)}>
+            <button
+              onClick={() => {
+                setOnSearch(true), searchRef.current.focus();
+              }}
+            >
               <i className="text-2xl bx bx-search" />
             </button>
             <button>
