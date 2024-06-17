@@ -132,7 +132,7 @@ const Navbar = () => {
           } items-center justify-center hidden gap-4 px-12 py-3 bg-white`}
         >
           <button onClick={() => setOnSearch(false)}>
-            <i className="text-2xl bx bx-bell" />
+            <i className="text-2xl bx bx-left-arrow-alt" />
           </button>
           <form className={`flex items-center gap-4 w-full`}>
             <input
@@ -187,7 +187,7 @@ const Navbar = () => {
           } items-center gap-2 px-2 py-2`}
         >
           <button onClick={() => setOnSearch(false)}>
-            <i className="text-2xl bx bx-bell" />
+            <i className="text-2xl bx bx-left-arrow-alt" />
           </button>
           <form className={`flex items-center gap-2 w-full`}>
             <input
