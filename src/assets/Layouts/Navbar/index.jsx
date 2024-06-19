@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Badge, Button, IconButton, Tooltip } from "@mui/material";
 import { useRef, useState } from "react";
 

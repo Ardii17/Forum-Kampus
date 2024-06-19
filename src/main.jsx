@@ -5,10 +5,20 @@ import "antd/dist/reset.css"; // Gunakan CSS global Ant Design
 import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./assets/Views/Home";
+import SigninView from "./assets/Views/Auth/Signin";
+import SignupView from "./assets/Views/Auth/Signup";
 
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <SigninView />,
+  },
+  {
+    path: "/signup",
+    element: <SignupView />,
+  },
+  {
+    path: "/home",
     element: <Home />,
   },
 ]);
