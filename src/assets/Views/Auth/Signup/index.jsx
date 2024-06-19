@@ -33,6 +33,7 @@ const SignupView = () => {
           id="outlined-basic"
           autoComplete="off"
           label="Password"
+          type="password"
           variant="outlined"
         />
         <Button type="submit" variant="contained" size="large">

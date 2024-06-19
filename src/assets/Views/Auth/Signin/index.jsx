@@ -16,6 +16,7 @@ const SigninView = () => {
           className="w-full"
           id="outlined-basic"
           label="Password"
+          type="password"
           autoComplete="false"
           variant="outlined"
         />
