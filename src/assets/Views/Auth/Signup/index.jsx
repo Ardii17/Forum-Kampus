@@ -1,7 +1,9 @@
 import { Button, TextField } from "@mui/material";
 import AuthLayout from "../../../Layouts/Auth";
+import { useNavigate } from "react-router-dom";
 
 const SignupView = () => {
+  const navigate = useNavigate();
   return (
     <AuthLayout title="Daftar Akun" button="Masuk" onClickButton="/">
       <form className="flex flex-col w-full gap-4">
@@ -36,7 +38,12 @@ const SignupView = () => {
           type="password"
           variant="outlined"
         />
-        <Button type="submit" variant="contained" size="large">
+        <Button
+          type="submit"
+          onClick={() => navigate("/")}
+          variant="contained"
+          size="large"
+        >
           Daftar
         </Button>
       </form>
