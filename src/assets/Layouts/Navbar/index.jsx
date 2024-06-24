@@ -125,7 +125,7 @@ const Navbar = () => {
                 </Badge>
               </IconButton>
             </Tooltip>
-            <div>
+            <div className="sm:hidden md:block">
               <Box
                 sx={{
                   display: "flex",
