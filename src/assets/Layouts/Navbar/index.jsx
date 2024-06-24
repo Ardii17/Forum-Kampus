@@ -125,150 +125,7 @@ const Navbar = () => {
                 </Badge>
               </IconButton>
             </Tooltip>
-            <Tooltip
-              title="Ardiansyah"
-              className="cursor-pointer ms-4"
-              arrow
-              placement="bottom"
-            >
-              <>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    textAlign: "center",
-                  }}
-                >
-                  <Tooltip title="Account settings">
-                    <IconButton
-                      onClick={handleClick}
-                      size="small"
-                      sx={{ ml: 2 }}
-                      aria-controls={open ? "account-menu" : undefined}
-                      aria-haspopup="true"
-                      aria-expanded={open ? "true" : undefined}
-                    >
-                      <img
-                        src="./../Image/Ardi.png"
-                        alt="Profile"
-                        width="32"
-                        className="rounded-full"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-                <Menu
-                  anchorEl={anchorEl}
-                  id="account-menu"
-                  open={open}
-                  onClose={handleClose}
-                  onClick={handleClose}
-                  PaperProps={{
-                    elevation: 0,
-                    sx: {
-                      overflow: "visible",
-                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                      mt: 1.5,
-                      "& .MuiAvatar-root": {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                      "&::before": {
-                        content: '""',
-                        display: "block",
-                        position: "absolute",
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: "background.paper",
-                        transform: "translateY(-50%) rotate(45deg)",
-                        zIndex: 0,
-                      },
-                    },
-                  }}
-                  transformOrigin={{ horizontal: "right", vertical: "top" }}
-                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                >
-                  <MenuItem onClick={handleClose}>
-                    <Avatar /> Profile
-                  </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    <Avatar /> My account
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem onClick={handleClose}>
-                    <ListItemIcon>
-                      <i className="text-2xl text-black bx bx-cog" />
-                    </ListItemIcon>
-                    Settings
-                  </MenuItem>
-                  <MenuItem onClick={handleClose}>
-                    <ListItemIcon>
-                      <i className="text-2xl text-black bx bx-log-out" />
-                    </ListItemIcon>
-                    Logout
-                  </MenuItem>
-                </Menu>
-              </>
-            </Tooltip>
-          </div>
-        </div>
-        <div
-          className={`${
-            onSearch ? "sm:hidden md:flex lg:hidden" : "hidden"
-          } items-center justify-center hidden gap-4 px-12 py-3 bg-white`}
-        >
-          <button onClick={() => setOnSearch(false)}>
-            <i className="text-2xl bx bx-left-arrow-alt" />
-          </button>
-          <form className={`flex items-center gap-4 w-full`}>
-            <input
-              type="text"
-              name="search"
-              ref={searchRef}
-              autoComplete="false"
-              onBlur={() => setOnSearch(false)}
-              className={`${
-                onSearch ? "p-4 py-3" : "w-0"
-              } z-10 rounded-full transition-all outline-1 flex-[4] bg-zinc-100`}
-            />
-            <button
-              type="submit"
-              className="flex-1 w-full py-3 font-semibold text-white bg-blue-700 rounded-full"
-            >
-              Cari
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <div className="fixed top-0 left-0 right-0 bg-white shadow md:hidden">
-        <div
-          className={`${
-            onSearch ? "hidden" : "flex"
-          } items-center justify-between w-full px-2`}
-        >
-          <img
-            src="./../Image/fk.png"
-            alt="Logo"
-            width={60}
-            className="scale-150 aspect-square"
-          />
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => {
-                setOnSearch(true), searchRef.current.focus();
-              }}
-            >
-              <i className="text-2xl bx bx-search" />
-            </button>
-            <button>
-              <i className="text-2xl bx bx-bell" />
-            </button>
-            <>
+            <div>
               <Box
                 sx={{
                   display: "flex",
@@ -285,7 +142,12 @@ const Navbar = () => {
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
                   >
-                    <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+                    <img
+                      src="./../Image/Ardi.png"
+                      alt="Profile"
+                      width="32"
+                      className="rounded-full"
+                    />
                   </IconButton>
                 </Tooltip>
               </Box>
@@ -344,7 +206,143 @@ const Navbar = () => {
                   Logout
                 </MenuItem>
               </Menu>
-            </>
+            </div>
+          </div>
+        </div>
+        <div
+          className={`${
+            onSearch ? "sm:hidden md:flex lg:hidden" : "hidden"
+          } items-center justify-center hidden gap-4 px-12 py-3 bg-white`}
+        >
+          <button onClick={() => setOnSearch(false)}>
+            <i className="text-2xl bx bx-left-arrow-alt" />
+          </button>
+          <form className={`flex items-center gap-4 w-full`}>
+            <input
+              type="text"
+              name="search"
+              ref={searchRef}
+              autoComplete="false"
+              onBlur={() => setOnSearch(false)}
+              className={`${
+                onSearch ? "p-4 py-3" : "w-0"
+              } z-10 rounded-full transition-all outline-1 flex-[4] bg-zinc-100`}
+            />
+            <button
+              type="submit"
+              className="flex-1 w-full py-3 font-semibold text-white bg-blue-700 rounded-full"
+            >
+              Cari
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div className="fixed top-0 left-0 right-0 bg-white shadow md:hidden">
+        <div
+          className={`${
+            onSearch ? "hidden" : "flex"
+          } items-center justify-between w-full px-2`}
+        >
+          <img
+            src="./../Image/fk.png"
+            alt="Logo"
+            width={60}
+            className="scale-150 aspect-square"
+          />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                setOnSearch(true), searchRef.current.focus();
+              }}
+            >
+              <i className="text-2xl bx bx-search" />
+            </button>
+            <button>
+              <i className="text-2xl bx bx-bell" />
+            </button>
+            <div>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClick}
+                    size="medium"
+                    sx={{ ml: 0 }}
+                    aria-controls={open ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                  >
+                    <img
+                      src="./../Image/Ardi.png"
+                      alt="Profile"
+                      width="32"
+                      className="rounded-full"
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Menu
+                anchorEl={anchorEl}
+                id="account-menu"
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: 0,
+                      mr: 0,
+                    },
+                    "&::before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                <MenuItem onClick={handleClose}>
+                  <Avatar /> Profile
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <Avatar /> My account
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <i className="text-2xl text-black bx bx-cog" />
+                  </ListItemIcon>
+                  Settings
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                  <ListItemIcon>
+                    <i className="text-2xl text-black bx bx-log-out" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </Menu>
+            </div>
           </div>
         </div>
         <div
