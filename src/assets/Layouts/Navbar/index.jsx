@@ -252,7 +252,7 @@ const Navbar = () => {
                     <img
                       src="./../Image/Ardi.png"
                       alt="Profile"
-                      width={32}
+                      width={40}
                       className="rounded-full"
                     />
                   </IconButton>
@@ -387,7 +387,7 @@ const Navbar = () => {
                     <img
                       src="./../Image/Ardi.png"
                       alt="Profile"
-                      width={32}
+                      width={40}
                       className="rounded-full"
                     />
                   </IconButton>
