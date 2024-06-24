@@ -1,15 +1,27 @@
-import { Badge, Button, IconButton, Tooltip } from "@mui/material";
-import { useRef, useState } from "react";
+import {
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
+import { useRef, useState, useContext } from "react";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
+import { ThemeContext } from "../../Contexts/ThemeContext";
+import Notification from "../Notification";
 
 const Navbar = () => {
   const [navPosition, setNavPosition] = useState("beranda");
   const [onSearch, setOnSearch] = useState(false);
+  const [onNotification, setOnNotification] = useState(false);
+  const Theme = useContext(ThemeContext);
   const searchRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -18,6 +30,15 @@ const Navbar = () => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const [anchorNotif, setAnchorNotif] = useState(null);
+  const openNotif = Boolean(anchorNotif);
+  const handleClickNotif = (event) => {
+    setAnchorNotif(event.currentTarget);
+  };
+  const handleCloseNotif = () => {
+    setAnchorNotif(null);
   };
 
   return (
@@ -96,14 +117,14 @@ const Navbar = () => {
                 className="z-20"
                 arrow
                 placement="bottom"
+                onClick={() => {
+                  setOnSearch(true), searchRef.current.focus();
+                }}
               >
                 <button
                   aria-label="search"
                   type="button"
                   className="p-2 rounded-full hover:bg-zinc-100"
-                  onClick={() => {
-                    setOnSearch(true), searchRef.current.focus();
-                  }}
                 >
                   <i className="px-1 text-2xl bx bx-search" />
                 </button>
@@ -118,14 +139,100 @@ const Navbar = () => {
                 } absolute z-10 rounded-full transition-all outline-1 bg-zinc-100`}
               />
             </form>
-            <Tooltip title="Notifikasi" arrow placement="bottom">
-              <IconButton>
-                <Badge badgeContent={1} color="primary">
-                  <i className="px-1 text-2xl bx bx-bell" />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-            <div className="sm:hidden md:block">
+            <div className="hidden md:block">
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <Tooltip title="Account settings">
+                  <IconButton
+                    onClick={handleClickNotif}
+                    size="small"
+                    sx={{ ml: 0 }}
+                    aria-controls={openNotif ? "account-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={openNotif ? "true" : undefined}
+                  >
+                    <i className="px-1 text-2xl bx bx-bell" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Menu
+                anchorEl={anchorNotif}
+                id="account-menu"
+                open={openNotif}
+                onClose={handleCloseNotif}
+                onClick={handleCloseNotif}
+                PaperProps={{
+                  elevation: 0,
+                  sx: {
+                    overflow: "visible",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                    mt: 1.5,
+                    "& .MuiAvatar-root": {
+                      width: 32,
+                      height: 32,
+                      ml: -0.5,
+                      mr: 1,
+                    },
+                    "&::before": {
+                      content: '""',
+                      display: "block",
+                      position: "absolute",
+                      top: 0,
+                      right: 14,
+                      width: 10,
+                      height: 10,
+                      bgcolor: "background.paper",
+                      transform: "translateY(-50%) rotate(45deg)",
+                      zIndex: 0,
+                    },
+                  },
+                }}
+                transformOrigin={{ horizontal: "right", vertical: "top" }}
+                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+              >
+                <div className="flex items-center justify-between px-4 pb-2">
+                  <p className="text-xl font-semibold">Notifikasi</p>
+                  <Tooltip
+                    title="Close"
+                    arrow
+                    placement="bottom"
+                    className="cursor-pointer"
+                  >
+                      <i className="px-1 text-2xl font-semibold bx bx-x" />
+                  </Tooltip>
+                </div>
+                <Divider />
+                <Box
+                  sx={{ width: Theme.device === "mobile" ? "100vw" : 350 }}
+                  role="presentation"
+                >
+                  <List>
+                    {["Inbox", "Starred", "Send email", "Drafts"].map(
+                      (text, index) => (
+                        <ListItem key={text} disablePadding>
+                          <ListItemButton>
+                            <ListItemIcon>
+                              {index % 2 === 0 ? (
+                                <i className="text-2xl bx bxs-message-alt-detail" />
+                              ) : (
+                                <i className="text-2xl bx bxs-message-alt-detail" />
+                              )}
+                            </ListItemIcon>
+                            <ListItemText primary={text} />
+                          </ListItemButton>
+                        </ListItem>
+                      )
+                    )}
+                  </List>
+                </Box>
+              </Menu>
+            </div>
+            <div className="hidden md:block">
               <Box
                 sx={{
                   display: "flex",
@@ -137,7 +244,7 @@ const Navbar = () => {
                   <IconButton
                     onClick={handleClick}
                     size="small"
-                    sx={{ ml: 2 }}
+                    sx={{ ml: 0 }}
                     aria-controls={open ? "account-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={open ? "true" : undefined}
@@ -145,7 +252,7 @@ const Navbar = () => {
                     <img
                       src="./../Image/Ardi.png"
                       alt="Profile"
-                      width="32"
+                      width={32}
                       className="rounded-full"
                     />
                   </IconButton>
@@ -161,7 +268,6 @@ const Navbar = () => {
                   elevation: 0,
                   sx: {
                     overflow: "visible",
-                    filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.32))",
                     mt: 1.5,
                     "& .MuiAvatar-root": {
                       width: 32,
@@ -215,7 +321,7 @@ const Navbar = () => {
           } items-center justify-center hidden gap-4 px-12 py-3 bg-white`}
         >
           <button onClick={() => setOnSearch(false)}>
-            <i className="text-2xl bx bx-left-arrow-alt" />
+            <i className="text-2xl bx bx-arrow-back" />
           </button>
           <form className={`flex items-center gap-4 w-full`}>
             <input
@@ -258,13 +364,13 @@ const Navbar = () => {
             >
               <i className="text-2xl bx bx-search" />
             </button>
-            <button>
+            <button onClick={() => setOnNotification(true)}>
               <i className="text-2xl bx bx-bell" />
             </button>
-            <div>
+            <div className="block md:hidden">
               <Box
                 sx={{
-                  display: "flex",
+                  display: Theme.device === "mobile" ? "flex" : "none",
                   alignItems: "center",
                   textAlign: "center",
                 }}
@@ -272,7 +378,7 @@ const Navbar = () => {
                 <Tooltip title="Account settings">
                   <IconButton
                     onClick={handleClick}
-                    size="medium"
+                    size="small"
                     sx={{ ml: 0 }}
                     aria-controls={open ? "account-menu" : undefined}
                     aria-haspopup="true"
@@ -281,7 +387,7 @@ const Navbar = () => {
                     <img
                       src="./../Image/Ardi.png"
                       alt="Profile"
-                      width="32"
+                      width={32}
                       className="rounded-full"
                     />
                   </IconButton>
@@ -297,13 +403,13 @@ const Navbar = () => {
                   elevation: 0,
                   sx: {
                     overflow: "visible",
-                    filter: "drop-shadow(0px 0px 1px rgba(0,0,0,0.32))",
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
                     mt: 1.5,
                     "& .MuiAvatar-root": {
                       width: 32,
                       height: 32,
-                      ml: 0,
-                      mr: 0,
+                      ml: -0.5,
+                      mr: 1,
                     },
                     "&::before": {
                       content: '""',
@@ -407,6 +513,7 @@ const Navbar = () => {
           </Tooltip>
         </div>
       </div>
+      <Notification isOpen={onNotification} setIsOpen={setOnNotification} />
     </>
   );
 };
