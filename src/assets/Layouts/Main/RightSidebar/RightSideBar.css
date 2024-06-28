@@ -1,0 +1,18 @@
+/* Untuk seluruh halaman atau elemen tertentu */
+.right-sidebar::-webkit-scrollbar {
+  width: 0px; /* Lebar scroll bar untuk vertikal */
+  height: 0px; /* Tinggi scroll bar untuk horizontal */
+}
+
+.right-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Warna track (latar belakang) */
+}
+
+.right-sidebar::-webkit-scrollbar-thumb {
+  background: #888; /* Warna thumb (pegangan) */
+  border-radius: 10px; /* Membuat sudut scroll bar membulat */
+}
+
+.right-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Warna thumb saat di-hover */
+}

@@ -4,7 +4,7 @@ const LeftSidebar = () => {
   const [universitas, setUniversitas] = useState(false);
   const [prodi, setProdi] = useState(false);
   return (
-    <div className="hidden lg:w-3/12 md:w-4/12 md:block">
+    <div className="hidden lg:w-3/12 md:w-4/12 md:block" id="left-sidebar">
       <div className="fixed min-h-screen lg:w-3/12 md:w-4/12 pe-4">
         <div className="flex flex-col">
           <div className="flex items-center gap-4 py-2 rounded-md cursor-pointer md:pe-4 lg:px-4 hover:bg-white">

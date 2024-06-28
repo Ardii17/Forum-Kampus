@@ -8,6 +8,7 @@ import Home from "./assets/Views/Home";
 import SigninView from "./assets/Views/Auth/Signin";
 import SignupView from "./assets/Views/Auth/Signup";
 import ThemeProvider from "./assets/Contexts/ThemeContext";
+import ConversationView from "./assets/Views/Conversation";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/home",
     element: <Home />,
+  },
+  {
+    path: "/messages",
+    element: <ConversationView />,
   },
 ]);
 

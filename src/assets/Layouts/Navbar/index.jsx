@@ -16,15 +16,18 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import { ThemeContext } from "../../Contexts/ThemeContext";
 import Notification from "../Notification";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const [navPosition, setNavPosition] = useState("beranda");
+  const navigate = useNavigate();
+  const location = useLocation();
   const [onSearch, setOnSearch] = useState(false);
   const [onNotification, setOnNotification] = useState(false);
   const Theme = useContext(ThemeContext);
   const searchRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -43,25 +46,36 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="fixed z-50 hidden min-w-full bg-white shadow md:px-8 lg:px-12 md:block">
+      <div
+        className={`${
+          location.pathname === "/messages" ? "px-4" : "md:px-8 lg:px-12"
+        } fixed z-50 hidden min-w-full bg-white shadow md:block`}
+      >
+        {/* Main Navbar */}
         <div
           className={`${
             onSearch ? "max-md:hidden md:hidden lg:flex" : "flex"
           } items-center justify-between`}
         >
+          {/* Start Logo Brand */}
           <p
             className="hidden text-2xl font-bold text-blue-700 md:block"
             id="brand"
           >
             Forum Kampus
           </p>
+          {/* End Logo Navbar */}
+
+          {/* Start Menu Navbar */}
           <div>
             <div className="flex py-2">
               <div className="flex justify-center w-1/4 px-2">
                 <Tooltip title="Beranda" arrow placement="bottom">
                   <Button
                     variant="secondary"
-                    onClick={() => setNavPosition("beranda")}
+                    onClick={() => {
+                      navigate("/home");
+                    }}
                   >
                     <i className="w-full text-2xl bx bx-home" />
                   </Button>
@@ -71,7 +85,7 @@ const Navbar = () => {
                 <Tooltip title="Forum" arrow placement="bottom">
                   <Button
                     variant="secondary"
-                    onClick={() => setNavPosition("forum")}
+                    onClick={() => navigate("/forum")}
                   >
                     <i className="w-full text-2xl bx bx-conversation" />
                   </Button>
@@ -81,7 +95,9 @@ const Navbar = () => {
                 <Tooltip title="Pesan" arrow placement="bottom">
                   <Button
                     variant="secondary"
-                    onClick={() => setNavPosition("pesan")}
+                    onClick={() => {
+                      navigate("/messages");
+                    }}
                   >
                     <i className="w-full text-2xl bx bx-message" />
                   </Button>
@@ -89,23 +105,35 @@ const Navbar = () => {
               </div>
               <div className="flex justify-center w-1/4 px-2">
                 <Tooltip title="Grup" arrow placement="bottom">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setNavPosition("grup")}
-                  >
+                  <Button variant="secondary" onClick={() => navigate("/grup")}>
                     <i className="w-full text-2xl bx bx-group" />
                   </Button>
                 </Tooltip>
               </div>
             </div>
             <div
-              className={`${navPosition === "beranda" ? "translate-x-0" : ""} ${
-                navPosition === "forum" ? "translate-x-full" : ""
-              } ${navPosition === "grup" ? "translate-x-[300%]" : ""} ${
-                navPosition === "pesan" ? "translate-x-[200%]" : ""
+              className={`${
+                location.pathname.split("/")[1] === "home"
+                  ? "translate-x-0"
+                  : ""
+              } ${
+                location.pathname.split("/")[1] === "forum"
+                  ? "translate-x-full"
+                  : ""
+              } ${
+                location.pathname.split("/")[1] === "grup"
+                  ? "translate-x-[300%]"
+                  : ""
+              } ${
+                location.pathname.split("/")[1] === "messages"
+                  ? "translate-x-[200%]"
+                  : ""
               } w-1/4 h-1 bg-blue-700 rounded-t transition-all`}
             />
           </div>
+          {/* End Menu Navbar */}
+
+          {/* Start Menu Right Navbar */}
           <div className="flex gap-2">
             <form
               className={`${
@@ -121,13 +149,13 @@ const Navbar = () => {
                   setOnSearch(true), searchRef.current.focus();
                 }}
               >
-                <button
+                <IconButton
                   aria-label="search"
                   type="button"
                   className="p-2 rounded-full hover:bg-zinc-100"
                 >
                   <i className="px-1 text-2xl bx bx-search" />
-                </button>
+                </IconButton>
               </Tooltip>
               <input
                 type="text"
@@ -136,7 +164,7 @@ const Navbar = () => {
                 onBlur={() => setOnSearch(false)}
                 className={`${
                   onSearch ? "lg:w-56 pe-4 ps-12 py-2" : "w-0"
-                } absolute z-10 rounded-full transition-all outline-1 bg-zinc-100`}
+                } absolute z-10 shadow rounded-full transition-all outline-1 bg-zinc-100`}
               />
             </form>
             <div className="hidden md:block">
@@ -147,14 +175,22 @@ const Navbar = () => {
                   textAlign: "center",
                 }}
               >
-                <Tooltip title="Account settings">
+                <Tooltip
+                  title="Notification"
+                  arrow
+                  placement="bottom"
+                  onClick={() => {
+                    setOnSearch(true), searchRef.current.focus();
+                  }}
+                >
                   <IconButton
+                    aria-label="Notification"
+                    type="button"
                     onClick={handleClickNotif}
-                    size="small"
-                    sx={{ ml: 0 }}
                     aria-controls={openNotif ? "account-menu" : undefined}
                     aria-haspopup="true"
                     aria-expanded={openNotif ? "true" : undefined}
+                    className="p-2 rounded-full hover:bg-zinc-100"
                   >
                     <i className="px-1 text-2xl bx bx-bell" />
                   </IconButton>
@@ -203,7 +239,7 @@ const Navbar = () => {
                     placement="bottom"
                     className="cursor-pointer"
                   >
-                      <i className="px-1 text-2xl font-semibold bx bx-x" />
+                    <i className="px-1 text-2xl font-semibold bx bx-x" />
                   </Tooltip>
                 </div>
                 <Divider />
@@ -314,7 +350,10 @@ const Navbar = () => {
               </Menu>
             </div>
           </div>
+          {/* End Menu Right Navbar */}
         </div>
+
+        {/* Search Tablet Navbar */}
         <div
           className={`${
             onSearch ? "sm:hidden md:flex lg:hidden" : "hidden"
@@ -342,8 +381,10 @@ const Navbar = () => {
             </button>
           </form>
         </div>
+        {/* End Tablet Navbar */}
       </div>
 
+      {/* Start Mobile Top Navbar */}
       <div className="fixed top-0 left-0 right-0 bg-white shadow md:hidden">
         <div
           className={`${
@@ -479,13 +520,17 @@ const Navbar = () => {
           </form>
         </div>
       </div>
+      {/* End Mobile Top Navbar */}
 
-      <div className="fixed bottom-0 left-0 right-0 flex items-start py-1 bg-white shadow md:hidden">
+      {/* Start Mobile Bottom Navbar */}
+      <div className="fixed bottom-0 left-0 right-0 z-10 flex items-start py-1 bg-white shadow md:hidden">
         <div className="flex justify-center w-1/4 px-2">
           <Tooltip title="Beranda" arrow placement="bottom">
             <Button
               variant="secondary"
-              onClick={() => setNavPosition("beranda")}
+              onClick={() => {
+                navigate("/home");
+              }}
             >
               <i className="w-full text-2xl bx bx-home" />
             </Button>
@@ -493,27 +538,36 @@ const Navbar = () => {
         </div>
         <div className="flex justify-center w-1/4 px-2">
           <Tooltip title="Forum" arrow placement="bottom">
-            <Button variant="secondary" onClick={() => setNavPosition("forum")}>
+            <Button variant="secondary" onClick={() => navigate("/forum")}>
               <i className="w-full text-2xl bx bx-conversation" />
             </Button>
           </Tooltip>
         </div>
         <div className="flex justify-center w-1/4 px-2">
           <Tooltip title="Pesan" arrow placement="bottom">
-            <Button variant="secondary" onClick={() => setNavPosition("pesan")}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                navigate("/messages");
+              }}
+            >
               <i className="w-full text-2xl bx bx-message" />
             </Button>
           </Tooltip>
         </div>
         <div className="flex justify-center w-1/4 px-2">
           <Tooltip title="Grup" arrow placement="bottom">
-            <Button variant="secondary" onClick={() => setNavPosition("grup")}>
+            <Button variant="secondary" onClick={() => navigate("/grup")}>
               <i className="w-full text-2xl bx bx-group" />
             </Button>
           </Tooltip>
         </div>
       </div>
+      {/* Start Mobile Bottom Navbar */}
+
+      {/* Start Bar Notification */}
       <Notification isOpen={onNotification} setIsOpen={setOnNotification} />
+      {/* End Bar Notification */}
     </>
   );
 };
