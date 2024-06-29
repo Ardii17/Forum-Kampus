@@ -203,8 +203,8 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
             />
             <div className="flex flex-col">
               <p className="font-semibold sm:text-sm">
-                {textName.length > 14 && Theme.device === "mobile"
-                  ? textName.slice(0, 14) + "..."
+                {textName.length > 10 && Theme.device === "mobile"
+                  ? textName.slice(0, 10) + "..."
                   : textName}
               </p>
               <p className="text-sm ">Online</p>
