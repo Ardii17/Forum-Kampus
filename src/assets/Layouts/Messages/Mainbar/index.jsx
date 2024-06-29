@@ -185,8 +185,8 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
   return (
     <div
       className={`${
-        isOpen ? "block" : "hidden"
-      } md:w-[71%] w-full border-s-2 bg-white max-h-screen h-screen overflow-hidden md:block`}
+        isOpen ? "flex" : "hidden"
+      } lg:w-[71%] md:w-[60%] w-full flex-grow border-s-2 bg-white max-h-screen h-screen overflow-hidden md:block`}
     >
       <div
         className="flex flex-col justify-between w-full mt-16"
@@ -202,8 +202,8 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
               className="rounded-full aspect-auto"
             />
             <div className="flex flex-col">
-              <p className="font-semibold">
-                {textName.length > 15 && Theme.device === "mobile"
+              <p className="font-semibold sm:text-sm">
+                {textName.length > 14 && Theme.device === "mobile"
                   ? textName.slice(0, 14) + "..."
                   : textName}
               </p>

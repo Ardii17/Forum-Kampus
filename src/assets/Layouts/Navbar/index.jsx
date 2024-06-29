@@ -7,7 +7,7 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-import { useRef, useState, useContext } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
 import Menu from "@mui/material/Menu";
@@ -27,6 +27,7 @@ const Navbar = () => {
   const searchRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const timeoutRef = useRef(null);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -43,6 +44,18 @@ const Navbar = () => {
   const handleCloseNotif = () => {
     setAnchorNotif(null);
   };
+
+  const handleClickSearch = () => {
+    timeoutRef.current = setTimeout(() => {
+      if (searchRef.current) {
+        searchRef.current.focus();
+      }
+    }, 200);
+  };
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
 
   return (
     <>
@@ -146,7 +159,7 @@ const Navbar = () => {
                 arrow
                 placement="bottom"
                 onClick={() => {
-                  setOnSearch(true), searchRef.current.focus();
+                  setOnSearch(true), handleClickSearch();
                 }}
               >
                 <IconButton
@@ -180,7 +193,7 @@ const Navbar = () => {
                   arrow
                   placement="bottom"
                   onClick={() => {
-                    setOnSearch(true), searchRef.current.focus();
+                    setOnSearch(true), handleClickSearch();
                   }}
                 >
                   <IconButton
@@ -400,7 +413,7 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
-                setOnSearch(true), searchRef.current.focus();
+                setOnSearch(true), handleClickSearch();
               }}
             >
               <i className="text-2xl bx bx-search" />

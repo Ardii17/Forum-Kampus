@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Navbar from "../Navbar";
 import LeftSidebar from "./LeftSidebar";
 import Mainbar from "./Mainbar";
 import RightSidebar from "./RightSidebar";
+import { ThemeContext } from "../../Contexts/ThemeContext";
 
 const MessagesLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const Theme = useContext(ThemeContext);
   //   useEffect(() => {
   //     const leftSidebar = document.getElementById("left-sidebar");
   //     const mainbar = document.getElementById("mainbar");
@@ -55,7 +57,11 @@ const MessagesLayout = () => {
       <div className="w-full ">
         <Navbar />
         <div className="flex max-h-screen">
-          <LeftSidebar isOpen={isOpen} setIsOpen={() => setIsOpen(true)} />
+          <LeftSidebar
+            isOpen={isOpen}
+            setIsOpen={(value) => setIsOpen(value)}
+            device={Theme.device}
+          />
           <Mainbar isOpen={isOpen} setIsOpen={setIsOpen} />
           <RightSidebar />
         </div>
