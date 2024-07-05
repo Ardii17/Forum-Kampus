@@ -44,18 +44,18 @@ const BoxContent = () => {
         </div>
         <hr />
         <div className="flex w-full pt-2">
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bx-like" />
             <p className="max-sm:text-sm">Suka</p>
-          </div>
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          </button>
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bx-comment" />
             <p className="max-sm:text-sm">Komentar</p>
-          </div>
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          </button>
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-xl bx bxs-share-alt" />
             <p className="max-sm:text-sm">Bagikan</p>
-          </div>
+          </button>
         </div>
       </div>
     </div>

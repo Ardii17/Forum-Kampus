@@ -12,24 +12,24 @@ const Mainbar = () => {
             height={50}
             className="rounded-full"
           />
-          <div className="flex items-center w-full px-4 py-1 text-gray-500 border border-gray-500 rounded-full cursor-text hover:bg-zinc-100">
+          <div className="flex items-center w-full px-4 py-1 text-gray-500 border border-gray-500 rounded-full cursor-pointer hover:bg-zinc-100">
             <p>Buat Postingan</p>
           </div>
         </div>
         <hr />
         <div className="flex mb-2">
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-2xl bx bxs-image" />
             <p className="font-semibold">Media</p>
-          </div>
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          </button>
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-2xl bx bx-notepad" />
             <p className="font-semibold">Acara</p>
-          </div>
-          <div className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
+          </button>
+          <button className="flex items-center justify-center flex-1 gap-2 p-2 rounded-md hover:bg-zinc-100">
             <i className="text-2xl bx bx-detail" />
             <p className="font-semibold">Artikel</p>
-          </div>
+          </button>
         </div>
       </div>
       <BoxContent />
