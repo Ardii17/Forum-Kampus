@@ -19,6 +19,12 @@ export default function ThemeProvider({ children }) {
     }
   };
 
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
   let mediaRecorder,
     chunks = [];
 
@@ -92,6 +98,7 @@ export default function ThemeProvider({ children }) {
         device,
         audioUrl,
         formatDate,
+        formatDuration,
         startRecording,
         stopRecording,
       }}

@@ -1,72 +1,22 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Tooltip } from "@mui/material";
+import { Box, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ThemeContext } from "../../../Contexts/ThemeContext";
 import EmojiPicker from "../../../UI/EmojiPicker";
 import WaveSurferComponent from "../../../UI/WaveSurfer";
-// import "emoji-mart/css/emoji-mart.css";
-
-const chatMessage = (text, date, status, type = "text") => {
-  return (
-    <div
-      className={`${
-        status === "sent" ? "justify-end" : "justify-start"
-      } flex items-center my-2`}
-    >
-      <div
-        className={`${
-          status === "sent"
-            ? "text-white bg-blue-500"
-            : "text-black bg-zinc-100"
-        } min-h-10 rounded-lg shadow px-3 py-2 max-w-96 h-auto`}
-      >
-        {type === "voice" ? <WaveSurferComponent audioFile={text} /> : <p>{text}</p>}
-        <p className="text-[11px] text-end">{date}</p>
-      </div>
-    </div>
-  );
-};
-
-const renderChat = (chatHistory, Theme) => {
-  let lastDate = null;
-
-  return chatHistory.map((chat, index) => {
-    const currentDate = new Date(chat.date).toLocaleDateString();
-
-    const newDateBox =
-      lastDate !== currentDate ? (
-        <div key={index} className="my-2 text-center">
-          <div className="inline-block px-3 py-1 text-gray-700 bg-gray-200 rounded">
-            <p className="text-sm font-semibold">
-              {Theme.formatDate(chat.date).day}
-            </p>
-          </div>
-        </div>
-      ) : null;
-
-    lastDate = currentDate;
-
-    return (
-      <div key={index}>
-        {newDateBox}
-        {chatMessage(
-          chat.message,
-          Theme.formatDate(chat.date).time,
-          chat.status,
-          chat.type
-        )}
-      </div>
-    );
-  });
-};
+import RenderChat from "./RenderChat";
 
 const Mainbar = ({ isOpen, setIsOpen }) => {
   const boxMessage = useRef(null);
   const Theme = useContext(ThemeContext);
   const [textName, setTextName] = useState("Muhammad Ardiansyah Firdaus");
   const [message, setMessage] = useState("");
+  const [isPaused, setIsPaused] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [durationRecording, setDurationRecording] = useState(0);
+  const durationRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const [showPicker, setShowPicker] = useState(false);
@@ -176,6 +126,14 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     setMessage("");
   };
 
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
   useEffect(() => {
     const scrollToBottom = () => {
       boxMessage.current.scrollTop = boxMessage.current.scrollHeight;
@@ -230,14 +188,53 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.start();
       setIsRecording(true);
+      setIsPaused(false);
+      setDurationRecording(0);
+
+      // Set interval untuk menghitung durasi perekaman
+      durationRef.current = setInterval(() => {
+        setDurationRecording((prevDuration) => prevDuration + 1);
+      }, 1000);
     }
     chunksRef.current = [];
   };
 
+  const pauseRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+      clearInterval(durationRef.current);
+    }
+  };
+
+  const resumeRecording = () => {
+    if (mediaRecorderRef.current && isPaused) {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+      durationRef.current = setInterval(() => {
+        setDurationRecording((prevDuration) => prevDuration + 1);
+      }, 1000);
+    }
+  };
+
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      setIsPaused(false);
+      clearInterval(durationRef.current);
+      setDurationRecording(0);
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current && (isRecording || isPaused)) {
+      mediaRecorderRef.current.stop();
+      chunksRef.current = [];
+      setIsRecording(false);
+      setIsPaused(false);
+      clearInterval(durationRef.current);
+      setDurationRecording(0);
     }
   };
 
@@ -292,7 +289,7 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
           ref={boxMessage}
         >
           <div className="flex-1 h-full px-4 place-content-end ">
-            {renderChat(chatHistory, Theme)}
+            {RenderChat(chatHistory, Theme)}
             <div className="h-1"></div>
           </div>
         </div>
@@ -312,25 +309,131 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
               <i className="text-2xl text-blue-500 bx bx-smile" />
             </button>
           </Tooltip>
-          <Tooltip title="Sisipkan" arrow placement="bottom">
-            <button className="cursor-pointer">
-              <i className="text-2xl text-blue-500 bx bx-link" />
-            </button>
-          </Tooltip>
-          <form onSubmit={handleSubmitMessage} className="relative w-full">
-            <input
-              type="text"
-              name="message"
-              value={message}
-              className="w-full px-4 py-2 rounded-full bg-zinc-100 pe-12"
-              onChange={(e) => setMessage(e.target.value)}
-              autoComplete="off"
-              placeholder="Tulis Pesan"
-            />
-            <button type="submit">
-              <i className="absolute text-2xl text-blue-500 -translate-y-1/2 bx bx-send top-1/2 right-4" />
-            </button>
-          </form>
+          <div>
+            <Box>
+              <Tooltip title="Sisipkan" arrow placement="bottom">
+                <IconButton
+                  size="small"
+                  sx={{ ml: 0 }}
+                  aria-controls={open ? "account-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={open ? "true" : undefined}
+                >
+                  <i className="text-2xl text-blue-500 bx bx-link" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Menu
+              anchorEl={anchorEl}
+              id="account-menu"
+              open={open}
+              onClose={handleClose}
+              onClick={handleClose}
+              PaperProps={{
+                elevation: 0,
+                sx: {
+                  overflow: "visible",
+                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  mt: 1.5,
+                  "& .MuiAvatar-root": {
+                    width: 32,
+                    height: 32,
+                    ml: -0.5,
+                    mr: 1,
+                  },
+                  "&::before": {
+                    content: '""',
+                    display: "block",
+                    position: "absolute",
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: "background.paper",
+                    transform: "translateY(-50%) rotate(45deg)",
+                    zIndex: 0,
+                  },
+                },
+              }}
+              transformOrigin={{ horizontal: "left", vertical: "bottom" }}
+              anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+            >
+              <MenuItem onClick={handleClose}>
+                <ListItemIcon>
+                  <i className="text-2xl text-black bx bx-cog" />
+                </ListItemIcon>
+                Settings
+              </MenuItem>
+              <MenuItem onClick={handleClose}>
+                <ListItemIcon>
+                  <i className="text-2xl text-black bx bx-log-out" />
+                </ListItemIcon>
+                Logout
+              </MenuItem>
+            </Menu>
+          </div>
+
+          {isRecording ? (
+            <div className="relative flex justify-end w-full gap-2">
+              <Tooltip title="Cancel" arrow placement="bottom">
+                <button
+                  className="px-2 bg-blue-500 rounded-full cursor-pointer"
+                  onClick={() => cancelRecording()}
+                >
+                  <i className="text-white bx bx-trash" />
+                </button>
+              </Tooltip>
+              {isPaused ? (
+                <Tooltip title="Play" arrow placement="bottom">
+                  <button
+                    className="px-1 bg-blue-500 rounded-full cursor-pointer"
+                    onClick={() => resumeRecording()}
+                  >
+                    <i className="text-2xl text-white bx bx-play" />
+                  </button>
+                </Tooltip>
+              ) : (
+                <Tooltip title="Pause" arrow placement="bottom">
+                  <button
+                    className="px-1 bg-blue-500 rounded-full cursor-pointer"
+                    onClick={() => pauseRecording()}
+                  >
+                    <i className="text-2xl text-white bx bx-pause" />
+                  </button>
+                </Tooltip>
+              )}
+              <div className="flex items-center gap-2 px-2 text-white bg-blue-500 rounded-full">
+                <span
+                  className="w-3 h-3 bg-red-500 rounded-full"
+                  id="recording"
+                />
+                <p>{Theme.formatDuration(durationRecording)}</p>
+              </div>
+              <Tooltip title="Send" arrow placement="bottom">
+                <button
+                  className="px-2 bg-blue-500 rounded-full cursor-pointer"
+                  onClick={() => stopRecording()}
+                >
+                  <i className="text-white bx bx-send" />
+                </button>
+              </Tooltip>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmitMessage} className="relative w-full">
+              <input
+                type="text"
+                name="message"
+                value={message}
+                className="w-full px-4 py-2 rounded-full bg-zinc-100 pe-12"
+                onChange={(e) => setMessage(e.target.value)}
+                autoComplete="off"
+                placeholder="Tulis Pesan"
+              />
+              <button type="submit">
+                <i className="absolute text-2xl text-blue-500 -translate-y-1/2 bx bx-send top-1/2 right-4" />
+              </button>
+            </form>
+          )}
           <Tooltip title="Pesan Suara" arrow placement="bottom">
             <button
               className="cursor-pointer"
