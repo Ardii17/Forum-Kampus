@@ -3,8 +3,11 @@
 import { Tooltip } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ThemeContext } from "../../../Contexts/ThemeContext";
+import EmojiPicker from "../../../UI/EmojiPicker";
+import WaveSurferComponent from "../../../UI/WaveSurfer";
+// import "emoji-mart/css/emoji-mart.css";
 
-const chatMessage = (text, date, status) => {
+const chatMessage = (text, date, status, type = "text") => {
   return (
     <div
       className={`${
@@ -18,17 +21,55 @@ const chatMessage = (text, date, status) => {
             : "text-black bg-zinc-100"
         } min-h-10 rounded-lg shadow px-3 py-2 max-w-96 h-auto`}
       >
-        <p className={`pe-8`}>{text}</p>
+        {type === "voice" ? <WaveSurferComponent audioFile={text} /> : <p>{text}</p>}
         <p className="text-[11px] text-end">{date}</p>
       </div>
     </div>
   );
 };
 
+const renderChat = (chatHistory, Theme) => {
+  let lastDate = null;
+
+  return chatHistory.map((chat, index) => {
+    const currentDate = new Date(chat.date).toLocaleDateString();
+
+    const newDateBox =
+      lastDate !== currentDate ? (
+        <div key={index} className="my-2 text-center">
+          <div className="inline-block px-3 py-1 text-gray-700 bg-gray-200 rounded">
+            <p className="text-sm font-semibold">
+              {Theme.formatDate(chat.date).day}
+            </p>
+          </div>
+        </div>
+      ) : null;
+
+    lastDate = currentDate;
+
+    return (
+      <div key={index}>
+        {newDateBox}
+        {chatMessage(
+          chat.message,
+          Theme.formatDate(chat.date).time,
+          chat.status,
+          chat.type
+        )}
+      </div>
+    );
+  });
+};
+
 const Mainbar = ({ isOpen, setIsOpen }) => {
   const boxMessage = useRef(null);
   const Theme = useContext(ThemeContext);
   const [textName, setTextName] = useState("Muhammad Ardiansyah Firdaus");
+  const [message, setMessage] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const [showPicker, setShowPicker] = useState(false);
   const [chatHistory, setChatHistory] = useState([
     {
       message: "Hi, how are you?",
@@ -123,47 +164,16 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
       status: "sent",
     },
   ]);
-  const renderChat = () => {
-    let lastDate = null;
-
-    return chatHistory.map((chat, index) => {
-      const currentDate = new Date(chat.date).toLocaleDateString();
-
-      const newDateBox =
-        lastDate !== currentDate ? (
-          <div key={index} className="my-2 text-center">
-            <div className="inline-block px-3 py-1 text-gray-700 bg-gray-200 rounded">
-              <p className="text-sm font-semibold">
-                {Theme.formatDate(chat.date).day}
-              </p>
-            </div>
-          </div>
-        ) : null;
-
-      lastDate = currentDate;
-
-      return (
-        <div key={index}>
-          {newDateBox}
-          {chatMessage(
-            chat.message,
-            Theme.formatDate(chat.date).time,
-            chat.status
-          )}
-        </div>
-      );
-    });
-  };
 
   const handleSubmitMessage = (event) => {
     event.preventDefault();
     const newChat = {
-      message: event.target.message.value,
+      message: message,
       date: new Date().toISOString(),
       status: "sent",
     };
     setChatHistory([...chatHistory, newChat]);
-    event.target.message.value = "";
+    setMessage("");
   };
 
   useEffect(() => {
@@ -173,7 +183,7 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
 
     scrollToBottom();
   }, []);
-  
+
   useEffect(() => {
     const scrollToBottom = () => {
       boxMessage.current.scrollTop = boxMessage.current.scrollHeight;
@@ -181,6 +191,55 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
 
     scrollToBottom();
   }, [chatHistory]);
+
+  const addEmoji = (emoji) => {
+    setMessage(message + emoji.native);
+  };
+
+  useEffect(() => {
+    // Setup mediaRecorder for audio
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          mediaRecorderRef.current = new MediaRecorder(stream);
+
+          mediaRecorderRef.current.ondataavailable = (e) => {
+            chunksRef.current.push(e.data);
+          };
+
+          mediaRecorderRef.current.onstop = () => {
+            const blob = new Blob(chunksRef.current, { type: "audio/wav" });
+            chunksRef.current = [];
+            const newChat = {
+              message: window.URL.createObjectURL(blob),
+              type: "voice",
+              date: new Date().toISOString(),
+              status: "sent",
+            };
+            setChatHistory([...chatHistory, newChat]);
+          };
+        })
+        .catch((error) => {
+          console.error("Error accessing media devices.", error);
+        });
+    }
+  }, [chatHistory]);
+
+  const startRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    }
+    chunksRef.current = [];
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
 
   return (
     <div
@@ -233,13 +292,23 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
           ref={boxMessage}
         >
           <div className="flex-1 h-full px-4 place-content-end ">
-            {renderChat()}
+            {renderChat(chatHistory, Theme)}
             <div className="h-1"></div>
           </div>
         </div>
-        <div className="bottom-0 z-10 flex items-center h-16 gap-6 px-4 py-2 bg-white border-t-2">
+        <div className="relative bottom-0 z-10 flex items-center h-16 gap-6 px-4 py-2 bg-white border-t-2">
+          {showPicker && (
+            <EmojiPicker
+              addEmoji={addEmoji}
+              onClickOutside={() => setShowPicker(false)}
+              style="absolute bottom-16 left-2"
+            />
+          )}
           <Tooltip title="Emoji" arrow placement="bottom">
-            <button className="cursor-pointer">
+            <button
+              className="cursor-pointer"
+              onClick={() => setShowPicker(!showPicker)}
+            >
               <i className="text-2xl text-blue-500 bx bx-smile" />
             </button>
           </Tooltip>
@@ -252,7 +321,9 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
             <input
               type="text"
               name="message"
+              value={message}
               className="w-full px-4 py-2 rounded-full bg-zinc-100 pe-12"
+              onChange={(e) => setMessage(e.target.value)}
               autoComplete="off"
               placeholder="Tulis Pesan"
             />
@@ -261,7 +332,10 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
             </button>
           </form>
           <Tooltip title="Pesan Suara" arrow placement="bottom">
-            <button className="cursor-pointer">
+            <button
+              className="cursor-pointer"
+              onClick={isRecording ? stopRecording : startRecording}
+            >
               <i className="text-2xl text-blue-500 bx bxs-microphone" />
             </button>
           </Tooltip>

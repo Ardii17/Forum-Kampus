@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { createContext, useEffect, useState } from "react";
 
@@ -5,6 +6,7 @@ export const ThemeContext = createContext();
 
 export default function ThemeProvider({ children }) {
   const [device, setDevice] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
 
   const handleResize = () => {
     const width = window.innerWidth;
@@ -15,6 +17,42 @@ export default function ThemeProvider({ children }) {
     } else {
       setDevice("desktop");
     }
+  };
+
+  let mediaRecorder,
+    chunks = [];
+
+  // mediaRecorder setup for audio
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: true,
+      })
+      .then((stream) => {
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (e) => {
+          chunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(chunks, { type: "audio/wav" });
+          chunks = [];
+          setAudioUrl(window.URL.createObjectURL(blob));
+        };
+      })
+      .catch((error) => {
+        console.log("Following error has occured : ", error);
+      });
+  }
+
+  const startRecording = () => {
+    setAudioUrl("");
+    mediaRecorder.start();
+  };
+
+  const stopRecording = () => {
+    mediaRecorder.stop();
   };
 
   function formatDate(dateString) {
@@ -52,7 +90,10 @@ export default function ThemeProvider({ children }) {
     <ThemeContext.Provider
       value={{
         device,
+        audioUrl,
         formatDate,
+        startRecording,
+        stopRecording,
       }}
     >
       {children}
