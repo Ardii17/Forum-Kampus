@@ -1,10 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Box, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ThemeContext } from "../../../Contexts/ThemeContext";
 import EmojiPicker from "../../../UI/EmojiPicker";
-import WaveSurferComponent from "../../../UI/WaveSurfer";
 import RenderChat from "./RenderChat";
 
 const Mainbar = ({ isOpen, setIsOpen }) => {
@@ -12,13 +11,7 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
   const Theme = useContext(ThemeContext);
   const [textName, setTextName] = useState("Muhammad Ardiansyah Firdaus");
   const [message, setMessage] = useState("");
-  const [isPaused, setIsPaused] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [durationRecording, setDurationRecording] = useState(0);
-  const durationRef = useRef(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
   const [showPicker, setShowPicker] = useState(false);
   const [chatHistory, setChatHistory] = useState([
     {
@@ -115,6 +108,14 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     },
   ]);
 
+  const [audioURL, setAudioURL] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [durationRecording, setDurationRecording] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const durationRef = useRef(null);
+
   const handleSubmitMessage = (event) => {
     event.preventDefault();
     const newChat = {
@@ -126,13 +127,13 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     setMessage("");
   };
 
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -154,83 +155,81 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     setMessage(message + emoji.native);
   };
 
-  useEffect(() => {
-    // Setup mediaRecorder for audio
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          mediaRecorderRef.current = new MediaRecorder(stream);
-
-          mediaRecorderRef.current.ondataavailable = (e) => {
-            chunksRef.current.push(e.data);
-          };
-
-          mediaRecorderRef.current.onstop = () => {
-            const blob = new Blob(chunksRef.current, { type: "audio/wav" });
-            chunksRef.current = [];
-            const newChat = {
-              message: window.URL.createObjectURL(blob),
-              type: "voice",
-              date: new Date().toISOString(),
-              status: "sent",
-            };
-            setChatHistory([...chatHistory, newChat]);
-          };
-        })
-        .catch((error) => {
-          console.error("Error accessing media devices.", error);
-        });
-    }
-  }, [chatHistory]);
-
   const startRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-      setIsPaused(false);
-      setDurationRecording(0);
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        chunksRef.current = [];
 
-      // Set interval untuk menghitung durasi perekaman
-      durationRef.current = setInterval(() => {
-        setDurationRecording((prevDuration) => prevDuration + 1);
-      }, 1000);
-    }
-    chunksRef.current = [];
+        mediaRecorderRef.current.ondataavailable = (event) => {
+          chunksRef.current.push(event.data);
+        };
+
+        mediaRecorderRef.current.onstop = () => {
+          const blob = new Blob(chunksRef.current, { type: "audio/wav" });
+          const url = URL.createObjectURL(blob);
+          setAudioURL(url);
+          setIsRecording(false);
+          setIsPaused(false);
+          setDurationRecording(0);
+          clearInterval(durationRef.current);
+        };
+
+        mediaRecorderRef.current.onpause = () => {
+          console.log("paused");
+          clearInterval(durationRef.current);
+          setIsPaused(true);
+        };
+
+        mediaRecorderRef.current.onresume = () => {
+          durationRef.current = setInterval(() => {
+            setDurationRecording((prevDuration) => prevDuration + 1);
+          }, 1000);
+          setIsPaused(false);
+        };
+
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+        durationRef.current = setInterval(() => {
+          setDurationRecording((prevDuration) => prevDuration + 1);
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error("Error accessing media devices.", error);
+      });
   };
 
   const pauseRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.pause();
-      setIsPaused(true);
-      clearInterval(durationRef.current);
     }
   };
 
   const resumeRecording = () => {
     if (mediaRecorderRef.current && isPaused) {
       mediaRecorderRef.current.resume();
-      setIsPaused(false);
-      durationRef.current = setInterval(() => {
-        setDurationRecording((prevDuration) => prevDuration + 1);
-      }, 1000);
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      setIsPaused(false);
-      clearInterval(durationRef.current);
-      setDurationRecording(0);
-    }
+  const sendRecording = () => {
+    mediaRecorderRef.current.stop();
+    const newChat = {
+      message: audioURL,
+      type: "voice",
+      date: new Date().toISOString(),
+      status: "sent",
+    };
+    setChatHistory([...chatHistory, newChat]);
+    setAudioURL("");
+    // if (!isRecording && audioURL) {
+    // }
   };
 
   const cancelRecording = () => {
-    if (mediaRecorderRef.current && (isRecording || isPaused)) {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      chunksRef.current = [];
+      setAudioURL("");
       setIsRecording(false);
       setIsPaused(false);
       clearInterval(durationRef.current);
@@ -294,85 +293,6 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
           </div>
         </div>
         <div className="relative bottom-0 z-10 flex items-center h-16 gap-6 px-4 py-2 bg-white border-t-2">
-          {showPicker && (
-            <EmojiPicker
-              addEmoji={addEmoji}
-              onClickOutside={() => setShowPicker(false)}
-              style="absolute bottom-16 left-2"
-            />
-          )}
-          <Tooltip title="Emoji" arrow placement="bottom">
-            <button
-              className="cursor-pointer"
-              onClick={() => setShowPicker(!showPicker)}
-            >
-              <i className="text-2xl text-blue-500 bx bx-smile" />
-            </button>
-          </Tooltip>
-          <div>
-            <Box>
-              <Tooltip title="Sisipkan" arrow placement="bottom">
-                <IconButton
-                  size="small"
-                  sx={{ ml: 0 }}
-                  aria-controls={open ? "account-menu" : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={open ? "true" : undefined}
-                >
-                  <i className="text-2xl text-blue-500 bx bx-link" />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            <Menu
-              anchorEl={anchorEl}
-              id="account-menu"
-              open={open}
-              onClose={handleClose}
-              onClick={handleClose}
-              PaperProps={{
-                elevation: 0,
-                sx: {
-                  overflow: "visible",
-                  filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                  mt: 1.5,
-                  "& .MuiAvatar-root": {
-                    width: 32,
-                    height: 32,
-                    ml: -0.5,
-                    mr: 1,
-                  },
-                  "&::before": {
-                    content: '""',
-                    display: "block",
-                    position: "absolute",
-                    top: 0,
-                    right: 14,
-                    width: 10,
-                    height: 10,
-                    bgcolor: "background.paper",
-                    transform: "translateY(-50%) rotate(45deg)",
-                    zIndex: 0,
-                  },
-                },
-              }}
-              transformOrigin={{ horizontal: "left", vertical: "bottom" }}
-              anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
-            >
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <i className="text-2xl text-black bx bx-cog" />
-                </ListItemIcon>
-                Settings
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <ListItemIcon>
-                  <i className="text-2xl text-black bx bx-log-out" />
-                </ListItemIcon>
-                Logout
-              </MenuItem>
-            </Menu>
-          </div>
-
           {isRecording ? (
             <div className="relative flex justify-end w-full gap-2">
               <Tooltip title="Cancel" arrow placement="bottom">
@@ -412,36 +332,70 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
               <Tooltip title="Send" arrow placement="bottom">
                 <button
                   className="px-2 bg-blue-500 rounded-full cursor-pointer"
-                  onClick={() => stopRecording()}
+                  onClick={() => sendRecording()}
                 >
                   <i className="text-white bx bx-send" />
                 </button>
               </Tooltip>
             </div>
           ) : (
-            <form onSubmit={handleSubmitMessage} className="relative w-full">
-              <input
-                type="text"
-                name="message"
-                value={message}
-                className="w-full px-4 py-2 rounded-full bg-zinc-100 pe-12"
-                onChange={(e) => setMessage(e.target.value)}
-                autoComplete="off"
-                placeholder="Tulis Pesan"
-              />
-              <button type="submit">
-                <i className="absolute text-2xl text-blue-500 -translate-y-1/2 bx bx-send top-1/2 right-4" />
-              </button>
-            </form>
+            <>
+              {showPicker && (
+                <EmojiPicker
+                  addEmoji={addEmoji}
+                  onClickOutside={() => setShowPicker(false)}
+                  style="absolute bottom-16 left-2"
+                />
+              )}
+              <Tooltip title="Emoji" arrow placement="bottom">
+                <button
+                  className="cursor-pointer"
+                  onClick={() => setShowPicker(!showPicker)}
+                >
+                  <i className="text-2xl text-blue-500 bx bx-smile" />
+                </button>
+              </Tooltip>
+              <div>
+                <Box>
+                  <Tooltip title="Sisipkan" arrow placement="bottom">
+                    <IconButton
+                      size="small"
+                      sx={{ ml: 0 }}
+                      aria-controls={open ? "account-menu" : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? "true" : undefined}
+                    >
+                      <i className="text-2xl text-blue-500 bx bx-link" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </div>
+
+              <form onSubmit={handleSubmitMessage} className="relative w-full">
+                <input
+                  type="text"
+                  name="message"
+                  value={message}
+                  className="w-full px-4 py-2 rounded-full bg-zinc-100 pe-12"
+                  onChange={(e) => setMessage(e.target.value)}
+                  autoComplete="off"
+                  placeholder="Tulis Pesan"
+                />
+                <button type="submit">
+                  <i className="absolute text-2xl text-blue-500 -translate-y-1/2 bx bx-send top-1/2 right-4" />
+                </button>
+              </form>
+
+              <Tooltip title="Pesan Suara" arrow placement="bottom">
+                <button
+                  className="cursor-pointer"
+                  onClick={() => startRecording()}
+                >
+                  <i className="text-2xl text-blue-500 bx bxs-microphone" />
+                </button>
+              </Tooltip>
+            </>
           )}
-          <Tooltip title="Pesan Suara" arrow placement="bottom">
-            <button
-              className="cursor-pointer"
-              onClick={isRecording ? stopRecording : startRecording}
-            >
-              <i className="text-2xl text-blue-500 bx bxs-microphone" />
-            </button>
-          </Tooltip>
         </div>
       </div>
     </div>
