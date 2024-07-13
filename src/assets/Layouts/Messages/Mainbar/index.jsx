@@ -108,7 +108,6 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
     },
   ]);
 
-  const [audioURL, setAudioURL] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [durationRecording, setDurationRecording] = useState(0);
@@ -160,16 +159,24 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
       .getUserMedia({ audio: true })
       .then((stream) => {
         mediaRecorderRef.current = new MediaRecorder(stream);
-        chunksRef.current = [];
 
         mediaRecorderRef.current.ondataavailable = (event) => {
           chunksRef.current.push(event.data);
         };
 
         mediaRecorderRef.current.onstop = () => {
-          const blob = new Blob(chunksRef.current, { type: "audio/wav" });
+          const blob = new Blob(chunksRef.current, {
+            type: "audio/webm;codecs=opus",
+          });
           const url = URL.createObjectURL(blob);
-          setAudioURL(url);
+          chunksRef.current = [];
+          const newChat = {
+            message: url,
+            type: "voice",
+            date: new Date().toISOString(),
+            status: "sent",
+          };
+          setChatHistory([...chatHistory, newChat]);
           setIsRecording(false);
           setIsPaused(false);
           setDurationRecording(0);
@@ -214,22 +221,11 @@ const Mainbar = ({ isOpen, setIsOpen }) => {
 
   const sendRecording = () => {
     mediaRecorderRef.current.stop();
-    const newChat = {
-      message: audioURL,
-      type: "voice",
-      date: new Date().toISOString(),
-      status: "sent",
-    };
-    setChatHistory([...chatHistory, newChat]);
-    setAudioURL("");
-    // if (!isRecording && audioURL) {
-    // }
   };
 
   const cancelRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      setAudioURL("");
       setIsRecording(false);
       setIsPaused(false);
       clearInterval(durationRef.current);
